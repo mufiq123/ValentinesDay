@@ -24,7 +24,10 @@
 
     body{
       margin:0;
-      min-height:100vh;
+      /* Better mobile viewport handling than 100vh */
+      min-height: 100svh;
+      min-height: 100dvh;
+
       display:grid;
       place-items:center;
       background:
@@ -34,7 +37,9 @@
         linear-gradient(135deg, #fff0f6, #ffe6ec);
       color:var(--ink);
       font-family:Inter, system-ui, sans-serif;
-      padding:24px;
+
+      /* Slightly smaller padding on phones */
+      padding: clamp(14px, 4vw, 24px);
       overflow:hidden;
     }
 
@@ -54,7 +59,7 @@
     }
 
     .wrap{
-      width:min(520px, 92vw);
+      width:min(520px, 94vw);
     }
 
     .card{
@@ -63,23 +68,23 @@
       border:1px solid var(--cardBorder);
       border-radius:24px;
       box-shadow:var(--shadow);
-      padding:34px 28px 26px;
+      padding: clamp(20px, 5vw, 34px) clamp(18px, 4.5vw, 28px);
       text-align:center;
     }
+
     /* force red (danger / bad choice) */
     .danger{
-    background: linear-gradient(135deg, var(--pink), var(--pink2)) !important;
-    color: white !important;
-    border: none !important;
+      background: linear-gradient(135deg, var(--pink), var(--pink2)) !important;
+      color: white !important;
+      border: none !important;
     }
 
     /* force white (boring / safe-looking) */
     .neutral{
-    background: rgba(255,255,255,.85) !important;
-    color: var(--ink) !important;
-    border: 1px solid rgba(31,36,48,.10) !important;
+      background: rgba(255,255,255,.85) !important;
+      color: var(--ink) !important;
+      border: 1px solid rgba(31,36,48,.10) !important;
     }
-
 
     .badge{
       display:inline-flex;
@@ -99,14 +104,17 @@
     h1{
       margin:0 0 10px;
       font-family:Fredoka, sans-serif;
-      font-size:clamp(26px, 4vw, 34px);
+      font-size: clamp(24px, 5.2vw, 34px);
       font-weight:600;
+      line-height: 1.15;
+      overflow-wrap: anywhere; /* helps long names on small screens */
     }
 
     p{
-      margin:0 0 22px;
+      margin:0 0 18px;
       color:var(--muted);
-      font-size:15px;
+      font-size: 15px;
+      line-height: 1.35;
     }
 
     .buttons{
@@ -118,13 +126,19 @@
     button{
       border:none;
       border-radius:14px;
-      padding:14px 16px;
-      font-size:15px;
+      padding: 14px 16px;
+
+      /* Better tap targets */
+      min-height: 48px;
+
+      font-size: 16px;
       font-weight:600;
       cursor:pointer;
       transition:transform .08s ease, box-shadow .18s ease;
       box-shadow:0 10px 24px rgba(0,0,0,.10);
       font-family:Inter, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     button:active{
@@ -142,17 +156,6 @@
       color:var(--ink);
     }
 
-    .primary-alt{
-      background:rgba(255,255,255,.85);
-      border:1px solid rgba(31,36,48,.10);
-      color:var(--ink);
-    }
-
-    .secondary-alt{
-      background:linear-gradient(135deg, var(--pink), var(--pink2));
-      color:white;
-    }
-
     .hidden{
       display:none !important;
     }
@@ -167,6 +170,21 @@
       50%{transform:translateX(6px)}
       75%{transform:translateX(-4px)}
       100%{transform:translateX(0)}
+    }
+
+    /* Mobile-only tweaks */
+    @media (max-width: 420px){
+      .heart{ opacity: .10; } /* reduce visual clutter */
+      .badge{ font-size: 12px; }
+      p{ font-size: 14px; }
+      .buttons{ gap: 10px; }
+    }
+
+    /* Respect users who hate animations */
+    @media (prefers-reduced-motion: reduce){
+      .heart{ animation: none; }
+      .shake{ animation: none; }
+      button{ transition: none; }
     }
   </style>
 </head>
@@ -215,10 +233,8 @@
         secondaryBtn.classList.add("hidden");
       } else {
         reallyCount++;
-        question.textContent =
-          "Are you " + "really ".repeat(reallyCount) + "sure?";
-        subtext.textContent =
-          "Not getting an Oura Ring if you keep saying Yes.";
+        question.textContent = "Are you " + "really ".repeat(reallyCount) + "sure?";
+        subtext.textContent = "Not getting an Oura Ring if you keep saying Yes.";
         shake();
       }
     });
@@ -228,17 +244,13 @@
         inSureMode = true;
 
         question.textContent = "Are you sure?";
-        subtext.textContent =
-          "Choose carefully. This may cause a CODE FREEZE❄️";
+        subtext.textContent = "Choose carefully. This may cause a CODE FREEZE❄️";
 
         secondaryBtn.textContent = "No, I want to be your Valentine";
         primaryBtn.textContent = "Yes I’m sure";
 
-        // No = red (emotional manipulation)
-        // Yes I'm sure = white (fake safety)
         secondaryBtn.classList.add("danger");
         primaryBtn.classList.add("neutral");
-
 
         buttons.innerHTML = "";
         buttons.appendChild(secondaryBtn);
